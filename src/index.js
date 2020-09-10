@@ -9,8 +9,8 @@ import Button from 'react-bootstrap/Button';
 const Display = (props) => {
   return (
     <div className="bg-secondary pr-2 py-1">
-      <Row  noGutters className="justify-content-end text-info"> {props.calculate}</Row>
-      <Row  noGutters className="justify-content-end text-light" id="display"> {props.display}</Row>
+      <Row  noGutters className="justify-content-end text-info overflow-hidden"> {props.calculate}</Row>
+      <Row  noGutters className="justify-content-end text-light overflow-hidden" id="display"> {props.display}</Row>
     </div>
   );
 };
@@ -284,15 +284,16 @@ const App = () => {
 			op === 'sub'
 		) {
 			if (getOperator(operationsState[operationsState.length - 2])) {
-				operationsState[operationsState.length - 2] = '';
+				//operationsState[operationsState.length - 2] = '';
 			}
 			if (getOperator(operationsState[operationsState.length - 1])) {
 				operationsState[operationsState.length - 1] = ops[op];
-			}
+			}else {
+        operationsState.push(ops[op]);
+      }
 		} else {
 			operationsState.push(ops[op]);
 		}
-    //operationsState[operationsState.length -1] = ops[op]
     setOperationsState([...operationsState])
     setDisplayOperations([...operationsState])
     setDisplayState([]);
