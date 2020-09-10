@@ -207,7 +207,13 @@ const Buttons = (props) => {
               </Button>
             </Col>
             <Col xs={4}>
-              <Button variant={groupOneColor} className={`w-100 ${borderStyle}`} id="decimal">
+              <Button 
+                variant={groupOneColor} 
+                className={`w-100 ${borderStyle}`} 
+                id="decimal"
+                value="decimal" 
+                onClick={(e) =>{onPressNumber(e.target.value)}}
+              >
                 .
               </Button>
             </Col>
@@ -242,27 +248,64 @@ const App = () => {
     setDisplayOperations([0]);
   };
   const handleNumber = (number) => {
-
+    //is this check need to operationsState?
+    if(number === 'decimal') {
+      number = displayState.join('').indexOf('.') === -1
+      ? '.'
+      : '';
+    }
+    if(parseInt(number) === 0) {
+      number = displayState.join('').indexOf('0') === -1
+      ? '0'
+      : '';
+    }
     setDisplayState([...displayState, number])
     setDisplay([...displayState, number]);
     setOperationsState([...operationsState, number])
     setDisplayOperations([...operationsState, number])
 
   }
+  const getOperator = (char) => {
+    return opsArr.some(op => op === char)
+  };
   const handleOperation = (op) => {
-    setOperationsState([...operationsState, ops[op]])
+
+    if (
+			getOperator(operationsState[operationsState.length - 1]) &&
+			op !== 'sub'
+		) {
+			if (getOperator(operationsState[operationsState.length - 2])) {
+				operationsState[operationsState.length - 2] = '';
+			}
+			operationsState[operationsState.length - 1] = ops[op];
+		} else if (
+			getOperator(operationsState[operationsState.length - 2]) &&
+			operationsState[operationsState.length - 2] !== '.' &&
+			op === 'sub'
+		) {
+			if (getOperator(operationsState[operationsState.length - 2])) {
+				operationsState[operationsState.length - 2] = '';
+			}
+			if (getOperator(operationsState[operationsState.length - 1])) {
+				operationsState[operationsState.length - 1] = ops[op];
+			}
+		} else {
+			operationsState.push(ops[op]);
+		}
+    //operationsState[operationsState.length -1] = ops[op]
+    setOperationsState([...operationsState])
+    setDisplayOperations([...operationsState])
     setDisplayState([]);
   }
   const handleEqual = () => {
-    console.log(operationsState.join(''))
     let evaled;
     try {
       evaled = eval(operationsState.join(''));
     } catch(e) {
       evaled = 0;
     }
-    setOperationsState([]);
-    setDisplayOperations([...operationsState, ' ', '=', evaled]);
+    setOperationsState([evaled]);
+    setDisplayOperations([...operationsState, '=', evaled]);
     setDisplay([evaled]);
     setDisplayState([]);
     
@@ -273,6 +316,12 @@ const App = () => {
     mul: '*',
     div: '/',
   }
+  const opsArr = [
+    '+',
+    '-',
+    '*',
+    '/',
+  ];
   return(
     <Container className="w-25 bg-dark pb-3 pt-3 mt-4 ">
         <Display 
